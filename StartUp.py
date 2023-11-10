@@ -9,18 +9,18 @@ import seaborn as sns
 data = pd.read_csv('startUp(1).csv')
 print(data.head())
 
-dx = data.copy()
+dx = data.drop('Unnamed: 0', axis = 1).copy()
 dx.isnull().sum()
 
 # SCALING THE DATA
-from sklearn.preprocessing import StandardScaler
-scaler = StandardScaler()
+# from sklearn.preprocessing import StandardScaler
+# scaler = StandardScaler()
 
-for i in dx.columns:
-  if dx[i].dtypes != 'O':
-    dx[[i]] = scaler.fit_transform(dx[[i]])
+# for i in dx.columns:
+#   if dx[i].dtypes != 'O':
+#     dx[[i]] = scaler.fit_transform(dx[[i]])
 
-dx.head()
+# dx.head()
 
 # ENCODING THE DATA
 from sklearn.preprocessing import LabelEncoder
@@ -136,14 +136,14 @@ else:
 
 st.header('Input Values')
 #Bring all the input into a dataframe
-input_variable = pd.DataFrame([{'R&D Spend':research, 'Administration': admin, 'Marketing Spend': mkt_spend}])
+input_variable = pd.DataFrame([{'R&D Spend':float(research), 'Administration': float(admin), 'Marketing Spend': float(mkt_spend)}])
 st.write(input_variable)
 
 # Standard Scale the Input Variable
 from sklearn.preprocessing import StandardScaler
 
-for i in input_variable.columns:
-    input_variable[i] = StandardScaler().fit_transform(input_variable[[i]])
+# for i in input_variable.columns:
+    # input_variable[i] = StandardScaler().fit_transform(input_variable[[i]])
 
 # Load model
 import pickle
@@ -152,13 +152,15 @@ model = pickle.load(open('startUpModel.pkl', "rb"))
 tab1, tab2 = st.tabs(["Modelling", "Interpretation"])
 with tab1:
     if st.button('Press To Predict'):
-        model.predict(input_variable)
+        # lin_reg.predict(input_variable)
         st.toast('Profitability Predicted')
         st.image('pngwing.com (2).png', width = 200)
         st.success('Predicted. Pls check the Interpretation Tab for interpretation')
 
 with tab2:
     st.subheader('Model Interpretation')
+    profit = lin_reg.predict(input_variable)
+    st.success(f'Predicted Profit is: {profit}')
     st.write(f"Profit = {model.intercept_.round(2)} + {model.coef_[0].round(2)} R&D Spend + {model.coef_[1].round(2)} Administration + {model.coef_[2].round(2)} Marketing Spend")
 
     st.markdown("<br>", unsafe_allow_html= True)
